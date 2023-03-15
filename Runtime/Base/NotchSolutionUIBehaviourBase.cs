@@ -55,20 +55,18 @@ namespace E7.NotchSolution
         /// <summary>
         ///     Overrides <see cref="UIBehaviour"/>
         /// </summary>
-        protected override void OnEnable()
+        protected virtual void OnEnable()
         {
-            base.OnEnable();
             DelayedUpdate();
         }
 
         /// <summary>
         ///     Overrides <see cref="UIBehaviour"/>
         /// </summary>
-        protected override void OnDisable()
+        protected virtual void OnDisable()
         {
             m_Tracker.Clear();
             LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
-            base.OnDisable();
         }
 
         /// <summary>
@@ -76,7 +74,7 @@ namespace E7.NotchSolution
         ///     This doesn't work when flipping the orientation to opposite side (180 deg).
         ///     It only works for 90 deg. rotation because that makes the rect transform changes dimension.
         /// </summary>
-        protected override void OnRectTransformDimensionsChange()
+        protected virtual void OnRectTransformDimensionsChange()
         {
             UpdateRectBase();
         }
@@ -154,15 +152,7 @@ namespace E7.NotchSolution
         /// <summary>
         ///     Overrides <see cref="UIBehaviour"/>.
         /// </summary>
-        protected override void Reset()
-        {
-            base.Reset();
-        }
-
-        /// <summary>
-        ///     Overrides <see cref="UIBehaviour"/>.
-        /// </summary>
-        protected override void OnValidate()
+        protected virtual void OnValidate()
         {
             if (gameObject.activeInHierarchy)
             {
