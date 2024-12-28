@@ -24,8 +24,7 @@ namespace E7.NotchSolution.Editor
     /// </summary>
     internal class NotchSimulator : EditorWindow, IHasCustomMenu, IPreprocessBuildWithReport //For bugfix hack
     {
-        private const string prefix = "NoSo";
-        private const string mockupCanvasName = prefix + "-MockupCanvas";
+        private const string mockupCanvasName = "NoSo-MockupCanvas";
         private const HideFlags overlayCanvasFlag = HideFlags.HideAndDontSave;
         private static NotchSimulator win;
         private static Vector2 gameviewResolution;
@@ -456,8 +455,7 @@ namespace E7.NotchSolution.Editor
                     }
 
                     DebugTransitions($"[Notch Solution] Creating canvas (Prefab mode {prefabMode})");
-                    var mockupCanvasPrefab =
-                        AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(prefabGuids.First()));
+                    var mockupCanvasPrefab = LoadMockupCanvasPrefab();
 
                     var instantiated =
                         prefabMode
@@ -566,6 +564,14 @@ namespace E7.NotchSolution.Editor
                         }
                     }
                 }
+            }
+            return;
+
+
+            static GameObject LoadMockupCanvasPrefab()
+            {
+                const string path = "Packages/com.e7.notch-solutions/Editor/Simulator/" + mockupCanvasName;
+                return AssetDatabase.LoadAssetAtPath<GameObject>(path);
             }
         }
     }
