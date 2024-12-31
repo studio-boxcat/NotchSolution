@@ -40,11 +40,7 @@ namespace E7.NotchSolution
     {
         protected override void UpdateRect()
         {
-            var selectedOrientation =
-                orientationType == SupportedOrientations.Dual
-                    ? NotchSolutionUtility.GetCurrentOrientation() == ScreenOrientation.LandscapeLeft ? landscapePaddings :
-                    portraitOrDefaultPaddings
-                    : portraitOrDefaultPaddings;
+            var selectedOrientation = portraitOrDefaultPaddings;
 
             m_Tracker.Clear();
             m_Tracker.Add(this, rectTransform,
@@ -80,7 +76,7 @@ namespace E7.NotchSolution
             rectTransform.anchorMax = Vector2.one;
 
             var topRect = GetCanvasRect();
-            var safeAreaRelative = SafeAreaRelative;
+            var safeAreaRelative = NotchSolutionUtility.ScreenSafeAreaRelative;
 
 #if DEBUG_NOTCH_SOLUTION
             Debug.Log($"Top {topRect} safe {safeAreaRelative} min {safeAreaRelative.xMin} {safeAreaRelative.yMin}");
@@ -118,8 +114,6 @@ namespace E7.NotchSolution
             {
                 relativeLDUR[3] = 0;
             }
-
-            var currentRect = rectTransform.rect;
 
             //TODO : Calculate the current padding relative, to enable "Unlocked" mode. (Not forcing zero padding)
             var finalPaddingsLDUR = new Vector4();
@@ -218,20 +212,13 @@ namespace E7.NotchSolution
 #endif
 
             //Calculate like zero position is at bottom left first, then diff with the real zero position.
-            rectTransform.anchoredPosition3D = new Vector3(
+            rectTransform.anchoredPosition = new Vector2(
                 finalPaddingsLDUR[0] + pivotInRect.x - zeroPosition.x,
-                finalPaddingsLDUR[1] + pivotInRect.y - zeroPosition.y,
-                rectTransform.anchoredPosition3D.z);
+                finalPaddingsLDUR[1] + pivotInRect.y - zeroPosition.y);
         }
 #pragma warning disable 0649
         [SerializeField]
-        private SupportedOrientations orientationType;
-
-        [SerializeField]
-        private PerEdgeEvaluationModes portraitOrDefaultPaddings = new PerEdgeEvaluationModes();
-
-        [SerializeField]
-        private PerEdgeEvaluationModes landscapePaddings = new PerEdgeEvaluationModes();
+        private PerEdgeEvaluationModes portraitOrDefaultPaddings;
 
         [Tooltip("Scale down the resulting value read from an edge to be less than an actual value.")]
         [SerializeField] [Range(0f, 1f)]

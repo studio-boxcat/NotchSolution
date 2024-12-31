@@ -1,1 +1,0 @@
-# [Safe Padding](safe-padding.md)

@@ -4,7 +4,7 @@
     ///     How a component looks at a particular edge to take the edge's property.
     ///     Meaning depends on context of that component.
     /// </summary>
-    internal enum EdgeEvaluationMode
+    internal enum EdgeEvaluationMode : byte
     {
         /// <summary>
         ///     Use a value reported from that edge.

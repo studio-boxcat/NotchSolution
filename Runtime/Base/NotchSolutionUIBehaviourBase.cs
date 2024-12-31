@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace E7.NotchSolution
@@ -18,52 +16,25 @@ namespace E7.NotchSolution
     /// </remarks>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
-    public abstract class NotchSolutionUIBehaviourBase : UIBehaviour, ILayoutSelfController, INotchSimulatorTarget
+    public abstract class NotchSolutionUIBehaviourBase : UIBehaviour, ILayoutSelfController
     {
-        private readonly WaitForEndOfFrame eofWait = new WaitForEndOfFrame();
-
-        [NonSerialized]
-        private RectTransform m_Rect;
-
+        [NonSerialized] private RectTransform m_Rect;
         protected DrivenRectTransformTracker m_Tracker;
-        private Rect[] storedSimulatedCutoutsRelative = NotchSolutionUtility.defaultCutouts;
 
-        private Rect storedSimulatedSafeAreaRelative = NotchSolutionUtility.defaultSafeArea;
+        protected RectTransform rectTransform => m_Rect ??= (RectTransform) transform;
 
         /// <summary>
-        ///     Already taken account whether should trust Notch Simulator
-        ///     or Unity's [Device Simulator package](https://docs.unity3d.com/Packages/com.unity.device-simulator@latest/).
+        ///     Overrides <see cref="UIBehaviour"/>
         /// </summary>
-        protected Rect SafeAreaRelative
-            => NotchSolutionUtility.ShouldUseNotchSimulatorValue
-                ? storedSimulatedSafeAreaRelative
-                : NotchSolutionUtility.ScreenSafeAreaRelative;
-
-        protected RectTransform rectTransform
+        private void OnEnable()
         {
-            get
-            {
-                if (m_Rect == null)
-                {
-                    m_Rect = GetComponent<RectTransform>();
-                }
-
-                return m_Rect;
-            }
+            UpdateRectBase();
         }
 
         /// <summary>
         ///     Overrides <see cref="UIBehaviour"/>
         /// </summary>
-        protected virtual void OnEnable()
-        {
-            DelayedUpdate();
-        }
-
-        /// <summary>
-        ///     Overrides <see cref="UIBehaviour"/>
-        /// </summary>
-        protected virtual void OnDisable()
+        private void OnDisable()
         {
             m_Tracker.Clear();
             LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
@@ -86,13 +57,6 @@ namespace E7.NotchSolution
 
         void ILayoutController.SetLayoutVertical()
         {
-        }
-
-        void INotchSimulatorTarget.SimulatorUpdate(Rect simulatedSafeAreaRelative, Rect[] simulatedCutoutsRelative)
-        {
-            storedSimulatedSafeAreaRelative = simulatedSafeAreaRelative;
-            storedSimulatedCutoutsRelative = simulatedCutoutsRelative;
-            UpdateRectBase();
         }
 
         protected abstract void UpdateRect();
@@ -121,42 +85,15 @@ namespace E7.NotchSolution
             UpdateRect();
         }
 
-        private void DelayedUpdate()
-        {
-            StartCoroutine(DelayedUpdateRoutine());
-
-#if UNITY_EDITOR
-            if (!Application.isPlaying)
-            {
-                // In Edit Mode, coroutines don't always work but we also can't call UpdateRectBase directly because it spams warning messages
-                // when called directly from OnValidate. So we can wait for 1 editor frame in EditorApplication.update instead
-                UnityEditor.EditorApplication.update += DelayedEditorUpdate;
-
-                void DelayedEditorUpdate()
-                {
-                    UnityEditor.EditorApplication.update -= DelayedEditorUpdate;
-                    if (this == null) return;
-                    UpdateRectBase();
-                };
-            }
-#endif
-        }
-
-        private IEnumerator DelayedUpdateRoutine()
-        {
-            yield return eofWait;
-            UpdateRectBase();
-        }
-
 #if UNITY_EDITOR
         /// <summary>
         ///     Overrides <see cref="UIBehaviour"/>.
         /// </summary>
-        protected virtual void OnValidate()
+        private void OnValidate()
         {
             if (gameObject.activeInHierarchy)
             {
-                DelayedUpdate();
+                UpdateRectBase();
             }
         }
 #endif
