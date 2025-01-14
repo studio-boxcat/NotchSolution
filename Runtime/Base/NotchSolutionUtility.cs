@@ -5,7 +5,7 @@ namespace E7.NotchSolution
     /// <summary>
     ///     Helper methods for Notch Solution's components.
     /// </summary>
-    public static class NotchSolutionUtility
+    internal static class NotchSolutionUtility
     {
         /// <summary>
         ///     Calculated from <see cref="Screen"/> API without caring about simulated value.
@@ -15,35 +15,22 @@ namespace E7.NotchSolution
         // TODO : Cache potential, but many pitfalls awaits so I have not done it.
         // - Some first frames (1~3) Unity didn't return a rect that take account of safe area for some reason. If we cache that then we failed.
         // - Orientation change requries clearing the cache again. Manually or automatically? How?
-        internal static Rect ScreenSafeAreaRelative
+        internal static Rect GetScreenSafeAreaRelative()
         {
-            get
-            {
-                var absolutePaddings = Screen.safeArea;
-                return ToScreenRelativeRect(absolutePaddings);
-            }
+            var safeArea = Screen.safeArea;
+            return ToScreenRelativeRect(safeArea);
         }
 
-        private static Rect ToScreenRelativeRect(Rect absoluteRect)
+        private static Rect ToScreenRelativeRect(Rect r)
         {
-#if UNITY_EDITOR
-            var size = UnityEditor.Handles.GetMainGameViewSize();
-            var w = size.x;
-            var h = size.y;
-#elif UNITY_STANDALONE
-            var w = absoluteRect.width;
-            var h = absoluteRect.height;
+#if UNITY_STANDALONE
+            var w = r.width;
+            var h = r.height;
 #else
             int w = Screen.currentResolution.width;
             int h = Screen.currentResolution.height;
 #endif
-            //Debug.Log($"{w} {h} {Screen.currentResolution} {absoluteRect}");
-            return new Rect(
-                absoluteRect.x / w,
-                absoluteRect.y / h,
-                absoluteRect.width / w,
-                absoluteRect.height / h
-            );
+            return new Rect(r.x / w, r.y / h, r.width / w, r.height / h);
         }
     }
 }

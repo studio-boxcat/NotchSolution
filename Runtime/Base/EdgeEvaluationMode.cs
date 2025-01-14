@@ -9,17 +9,17 @@
         /// <summary>
         ///     Use a value reported from that edge.
         /// </summary>
-        On,
+        On = 0,
 
         /// <summary>
         ///     Like <see cref="On"/> but also look at the opposite edge,
         ///     if the value reported is higher on the other side, assume that value instead.
         /// </summary>
-        Balanced,
+        Balanced = 1,
 
         /// <summary>
         ///     Do not use a value reported from that edge.
         /// </summary>
-        Off,
+        Off = 2,
     }
 }
